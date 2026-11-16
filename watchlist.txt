@@ -1,0 +1,14 @@
+# Your watchlist - one card per line. Lines starting with # are ignored.
+#
+# You can write a card in any of these ways:
+#   Jinx, Loose Cannon                      <- card name (all printings of it)
+#   Ahri                                    <- part of a name (every card containing "Ahri", max 15)
+#   https://www.cardmarket.com/en/Riftbound/Products?idProduct=123456
+#   123456                                  <- Cardmarket product id
+#
+# Add "(foil)" or "(normal)" at the end to watch only that version:
+#   Kai'Sa, Daughter of the Void (foil)
+#
+# After the next daily run, check the dashboard: any line that matched
+# nothing is listed under "Warnings".
+

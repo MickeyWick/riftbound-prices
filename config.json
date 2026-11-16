@@ -1,0 +1,24 @@
+{
+  "_help": "Settings for the Riftbound price tracker. Percentages are plain numbers (15 = 15%). Prices are in EUR.",
+
+  "game_id": 22,
+  "include_sealed": true,
+  "history_days": 400,
+
+  "_movers_min_price": "Cards cheaper than this are left out of the 'biggest movers' lists (cheap cards jump 50% on a few cents).",
+  "movers_min_price": 1.0,
+
+  "_watchlist_alerts": "Alert for a watchlist card when its trend price moves at least this much in 1 day or over 7 days (up or down).",
+  "watchlist_alerts": { "pct_1d": 15, "pct_7d": 25 },
+
+  "_all_cards_alerts": "Also alert for ANY card worth at least min_price that moves pct_1d in a single day. Set enabled to false to turn off.",
+  "all_cards_alerts": { "enabled": true, "min_price": 5.0, "pct_1d": 40 },
+
+  "spreadsheet_history_days": 90,
+
+  "_card_images": "Download card pictures, set, rarity and card number from OpenRift (openrift.app) each day.",
+  "card_images": true,
+
+  "_expansions": "Optional: give Cardmarket expansion ids a readable name, e.g. \"6286\": \"Origins\". The dashboard shows 'Set <id>' until you do.",
+  "expansions": {}
+}
