@@ -1,8 +1,8 @@
 {
  "date": "2026-11-16",
- "updated": "2026-11-16T02:28+00:00",
+ "updated": "2026-11-16T03:24+00:00",
  "days_of_history": 2,
- "products": 3224,
+ "products": 2442,
  "watchlist": [],
  "warnings": [],
  "alerts": 1,
@@ -16,5 +16,5 @@
   "Showcase",
   "Promo"
  ],
- "with_images": 3032
+ "with_images": 2251
 }
