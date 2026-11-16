@@ -1,11 +1,11 @@
 {
- "date": "2026-11-15",
- "updated": "2026-11-16T01:49+00:00",
- "days_of_history": 1,
- "products": 3223,
+ "date": "2026-11-16",
+ "updated": "2026-11-16T02:28+00:00",
+ "days_of_history": 2,
+ "products": 3224,
  "watchlist": [],
  "warnings": [],
- "alerts": 0,
+ "alerts": 1,
  "movers_min_price": 1.0,
  "image_base": "https://openrift.app/media/cards/",
  "rarity_order": [
