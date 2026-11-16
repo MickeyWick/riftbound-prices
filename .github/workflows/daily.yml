@@ -1,0 +1,64 @@
+name: Daily price update
+
+on:
+  schedule:
+    # Every day at 05:17 UTC. Cardmarket publishes the new price guide in the early morning (Europe).
+    - cron: "17 5 * * *"
+  workflow_dispatch: {}      # lets you run it by hand from the Actions tab
+  push:
+    paths:
+      - watchlist.txt        # rebuild the dashboard right after you edit your watchlist
+      - config.json
+
+permissions:
+  contents: write            # commit the new snapshot + dashboard data
+  issues: write              # open an issue when there are price alerts
+
+concurrency:
+  group: price-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download prices and rebuild
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] && ls data/snapshots/*.csv >/dev/null 2>&1; then
+            python tracker/update.py --rebuild-only
+          else
+            python tracker/update.py
+          fi
+
+      - name: Commit data
+        run: |
+          git config user.name  "price-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data docs alerts.md
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "Prices $(date -u +%F)"
+            git push
+          fi
+
+      - name: Open an issue for price alerts
+        if: github.event_name != 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -s alerts.md ]; then
+            gh label create price-alert --color C8A24A --description "Daily price alerts" 2>/dev/null || true
+            gh issue create --title "Price alerts $(date -u +%F)" --body-file alerts.md --label price-alert
+          else
+            echo "No alerts today"
+          fi
