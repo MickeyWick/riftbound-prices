@@ -104,10 +104,15 @@ textarea.deckin{width:100%;min-height:260px;background:var(--panel2);color:var(-
 /* ------------------------------------------------------------ data load */
 function indexCards(data){
   C.cards = data.cards; C.sets = data.sets;
-  C.slot = {}; C.byName = {}; C.byCode = {};
+  C.slot = {}; C.byName = {}; C.byCode = {}; C.legendAlias = {};
   for (const s of C.cards){
     C.slot[s.k] = s;
     (C.byName[norm(s.name)] ||= []).push(s);
+    // Legends: also accept OpenRift's short title ("Pridestalker", "Dark Child, Starter" -> "Dark Child")
+    if (/legend/i.test(s.type || '')){
+      for (const a of new Set([s.alt, s.name.includes(', ') ? s.name.slice(s.name.indexOf(', ')+2) : null, (s.alt||s.name).split(', ')[0]].filter(Boolean)))
+        ((C.legendAlias ||= {})[norm(a)] ||= []).push(s);
+    }
     const short = s.k.split('/')[0].split('|')[0];
     (C.byCode[norm(short)] ||= []).push(s);
     (C.byCode[norm(s.k.split('|')[0])] ||= []).push(s);
@@ -214,6 +219,12 @@ function findCard(name){
   let n = name.replace(/\s*[\[(][^\])]*[\])]\s*$/, '').replace(/\*+$/,'').trim();
   const tries = [n, n.replace(/\s+-\s+/, ', '), n.replace(/\s*,\s*/, ', ')];
   for (const t of tries){ const l = C.byName[norm(t)] || C.byCode[norm(t)]; if (l && l.length) return l[0]; }
+  // Legend written as "Champion, Title" while the card list only has the title (or the reverse)
+  const al = C.legendAlias || {};
+  for (const t of tries){
+    const parts = [t, t.includes(', ') ? t.slice(t.indexOf(', ')+2) : null].filter(Boolean);
+    for (const x of parts){ const l = al[norm(x)]; if (l && l.length) return l[0]; }
+  }
   const m = n.match(/^([A-Za-z]{2,4})-?(\d{1,3})([a-z*]?)/); // set codes like OGN-001, OGN-001a
   if (m){ const code = `${m[1]}-${m[2].padStart(3,'0')}${m[3]||''}`; const l = C.byCode[norm(code)]; if (l) return l[0]; }
   return null;
@@ -232,7 +243,7 @@ function parseDeck(text){
     const slot = findCard(name);
     if (!slot){ unmatched.push(line); continue; }
     inBlock = true;
-    out.push({name: slot.name, qty, sec, block, type: slot.type || ''});
+    out.push({name: slot.name, typed: name.trim(), qty, sec, block, type: slot.type || ''});
   }
   // No headers (Piltover Archive plain text): sort by card type, legend first then champion block.
   for (const c of out){
@@ -249,15 +260,34 @@ function parseDeck(text){
   }
   const merged = [];
   for (const c of out){ const ex = merged.find(x=>x.name===c.name && x.sec===c.sec); if (ex) ex.qty += c.qty; else merged.push({name:c.name, qty:c.qty, sec:c.sec}); }
-  return {cards: merged, unmatched};
+  const lg = out.find(c=>c.sec==='legend');
+  return {cards: merged, unmatched, legendTyped: lg ? lg.typed : null};
+}
+/* Decks saved before a matching fix: try their unrecognised lines again. */
+function rematchDecks(){
+  let fixed = false;
+  for (const d of C.coll.decks){
+    for (const c of d.cards){ if (C.byName[norm(c.name)]) continue; const sl = findCard(c.name); if (sl && sl.name !== c.name){ c.name = sl.name; fixed = true; } }
+    if (!d.unmatched || !d.unmatched.length) continue;
+    const res = parseDeck(d.unmatched.join('\n'));
+    for (const c of res.cards){
+      if (c.sec === 'legend' && d.cards.some(x=>x.sec==='legend')) c.sec = 'main';
+      const ex = d.cards.find(x=>x.name===c.name && x.sec===c.sec);
+      if (ex) ex.qty += c.qty; else d.cards.unshift(c);
+      fixed = true;
+    }
+    d.unmatched = res.unmatched;
+    d.cards.sort((a,b)=>SECTIONS.findIndex(s=>s[0]===a.sec) - SECTIONS.findIndex(s=>s[0]===b.sec));
+  }
+  return fixed;
 }
 function deckText(d){
   return SECTIONS.map(([k,l]) => { const cs = d.cards.filter(c=>c.sec===k); return cs.length ? `${l}:\n` + cs.map(c=>`${c.qty} ${c.name}`).join('\n') : ''; })
     .filter(Boolean).join('\n\n');
 }
-function deckName(cards){
+function deckName(cards, legendTyped){
   const lg = cards.find(c=>c.sec==='legend'), ch = cards.find(c=>c.sec==='champion');
-  let base = lg ? lg.name : ch ? ch.name : 'New deck';
+  let base = legendTyped || (lg ? lg.name : ch ? ch.name : 'New deck');
   let n = base, i = 2; while (C.coll.decks.some(d=>d.name===n)) n = `${base} (${i++})`;
   return n;
 }
@@ -522,7 +552,7 @@ document.addEventListener('click', async e => {
       if (!res.cards.length){ $c('#importmsg').innerHTML = `<div class="unm" style="margin-top:10px">No cards recognised. Paste the deck's text export, one card per line like <code>3 Kai'Sa, Survivor</code>.</div>`; return; }
       const name = $c('#dname').value.trim();
       if (C.importing && C.importing !== true){ const x = C.coll.decks.find(y=>y.id===C.importing); x.cards = res.cards; x.unmatched = res.unmatched; if (name) x.name = name; }
-      else { const id = 'd' + Date.now().toString(36); C.coll.decks.push({id, name: name || deckName(res.cards), cards:res.cards, unmatched:res.unmatched, created:new Date().toISOString().slice(0,10)}); C.deck = id; }
+      else { const id = 'd' + Date.now().toString(36); C.coll.decks.push({id, name: name || deckName(res.cards, res.legendTyped), cards:res.cards, unmatched:res.unmatched, created:new Date().toISOString().slice(0,10)}); C.deck = id; }
       C.importing = false; changed(); render(); break; }
     case 'copydeck': try { await navigator.clipboard.writeText(deckText(d)); act.textContent = '✓ Copied'; } catch(err){ C.importing = d.id; render(); } break;
     case 'deldeck': if (confirm(`Delete the deck "${d.name}"? Your collection is not changed.`)){ C.coll.decks = C.coll.decks.filter(x=>x!==d); C.deck = (C.coll.decks[0]||{}).id || null; changed(); render(); } break;
@@ -596,6 +626,7 @@ async function init(){
     setStatus('local');
   }
   C.deck = C.deck || (C.coll.decks[0]||{}).id || null;
+  if (rematchDecks()) changed();
   C.ready = true; render();
 }
 if (P() && P().items && P().items.length) init();

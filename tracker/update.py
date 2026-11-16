@@ -234,6 +234,24 @@ def _title(s):
     return (s or "").title()
 
 
+def card_display_name(card):
+    """
+    OpenRift names legends by their title only ("Pridestalker", "Dark Child, Starter"), while
+    decklists and Cardmarket use "Rengar, Pridestalker" / "Annie, Dark Child". Same rule as
+    OpenRift's own legendDisplayName(): champion tag + title.
+    """
+    name = card.get("name") or ""
+    types = [t.lower() for t in card.get("types") or []]
+    tags = card.get("tags") or []
+    if "legend" not in types or not tags:
+        return name
+    prefix = f"{tags[0]}, "
+    if name.startswith(prefix):
+        return name
+    title = name.split(", ")[0]
+    return prefix + title
+
+
 def build_binder(catalog, links):
     """
     Every English printing, grouped into binder slots by printed card number
@@ -262,7 +280,7 @@ def build_binder(catalog, links):
         st = sets.get(pr.get("setId"), {})
         if s is None:
             s = slots[key] = {
-                "k": key, "name": card.get("name") or pr.get("printedName") or code,
+                "k": key, "name": card_display_name(card) or pr.get("printedName") or code,
                 "card": card.get("slug"), "set": st.get("slug") or "?",
                 "rank": pr.get("canonicalRank") if pr.get("canonicalRank") is not None else 10**9,
                 "rar": _title(pr.get("rarity")),
@@ -270,6 +288,8 @@ def build_binder(catalog, links):
                 "dom": [_title(d) for d in card.get("domains") or []],
                 "img": img, "fin": [], "cm": {},
             }
+            if card.get("name") and card.get("name") != s["name"]:
+                s["alt"] = card["name"]          # OpenRift's own name, also accepted in decklists
             if pr.get("isSigned"):
                 s["sig"] = True
             if pr.get("artVariant") and pr["artVariant"] != "normal":
