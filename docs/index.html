@@ -166,7 +166,7 @@
       <label>Rarity <select id="frar"><option value="">All rarities</option></select></label>
       <label><select id="kind"><option value="all">Singles + sealed</option><option value="single">Singles only</option><option value="sealed">Sealed only</option></select></label>
       <label><select id="foil"><option value="all">Normal + foil</option><option value="normal">Normal only</option><option value="foil">Foil only</option></select></label>
-      <label>Min € <input type="number" id="minp" min="0" step="0.5"></label>
+      <label>Price € <input type="number" id="pmin" min="0" step="0.5" placeholder="from"> – <input type="number" id="pmax" min="0" step="0.5" placeholder="to"></label>
     </div>
     <div class="crow"><input type="search" id="q" placeholder="Search card name, set or number…"></div>
   </div>
@@ -198,7 +198,7 @@
 
 <script>
 const S = { items:[], hist:null, meta:{}, view:'cards', win:'ch7', sort:'price-desc', group:'none',
-            fset:'', frar:'', minp:1, kind:'all', foil:'all', q:'', limit:0 };
+            fset:'', frar:'', pmin:null, pmax:null, kind:'all', foil:'all', q:'', limit:0 };
 const PAGE = {cards:24, grid:48, table:150};
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -224,7 +224,7 @@ function thumb(i){
 const title = i => `${i.sc ? i.sc + ' ' : ''}${i.name}`;
 const subline = i => [i.rar ? `<span class="r-${esc(i.rar)}">${esc(i.rar)}</span>` : '', i.code ? esc(i.code) : '', i.foil ? '<span style="color:var(--foil)">Foil</span>' : ''].filter(Boolean).join(' · ');
 
-const PREF_KEYS = ['view','win','sort','group','fset','frar','minp','kind','foil'];
+const PREF_KEYS = ['view','win','sort','group','fset','frar','pmin','pmax','kind','foil'];
 function loadPrefs(){ try{ const p = JSON.parse(localStorage.getItem('rbt2')||'null'); if(p){ PREF_KEYS.forEach(k=>{ if(k in p) S[k]=p[k]; }); return true; } }catch(e){} return false; }
 function savePrefs(){ try{ localStorage.setItem('rbt2', JSON.stringify(Object.fromEntries(PREF_KEYS.map(k=>[k,S[k]])))); }catch(e){} }
 
@@ -236,7 +236,7 @@ async function load(){
   ]);
   S.items = latest.items; S.meta = meta;
   if (meta.rarity_order) RAR = meta.rarity_order;
-  if (!loadPrefs()){ S.win = (meta.days_of_history||1) >= 8 ? 'ch7' : 'vs30'; S.minp = meta.movers_min_price ?? 1; }
+  if (!loadPrefs()){ S.win = (meta.days_of_history||1) >= 8 ? 'ch7' : 'vs30'; }
   $('#sub').textContent = `Cardmarket trend prices for ${latest.date} · ${meta.days_of_history||1} day(s) of history · ${S.items.length.toLocaleString()} products`;
   let notes = '';
   if ((meta.days_of_history||1) < 8)
@@ -266,7 +266,8 @@ function bindControls(){
   const sel = (id, key, num) => { const el=$('#'+id); el.value = S[key]; if (el.value!==String(S[key])) { el.value = el.options[0].value; S[key]=el.value; }
     el.onchange = el.oninput = e=>{ S[key] = num ? (parseFloat(e.target.value)||0) : e.target.value; S.limit=0; savePrefs(); render(); }; };
   ['sort','group','fset','frar','kind','foil'].forEach(k=>sel(k,k));
-  $('#minp').value = S.minp; $('#minp').oninput = e=>{ S.minp=parseFloat(e.target.value)||0; savePrefs(); render(); };
+  ['pmin','pmax'].forEach(k=>{ const el=$('#'+k); el.value = S[k] ?? '';
+    el.oninput = e=>{ const v=parseFloat(e.target.value); S[k] = isNaN(v) ? null : v; S.limit=0; savePrefs(); render(); }; });
   $('#q').oninput = e=>{ S.q=e.target.value.trim().toLowerCase(); S.limit=0; renderBrowse(); };
   $('#moreBtn').onclick = ()=>{ S.limit = (S.limit||PAGE[S.view]) + PAGE[S.view]; renderBrowse(); };
   $('#csvBtn').onclick = csv;
@@ -290,7 +291,8 @@ function filtered(){
   return S.items.filter(i =>
     (S.kind==='all' || i.kind===S.kind) &&
     (S.foil==='all' || (S.foil==='foil') === i.foil) &&
-    (!S.fset || i.set===S.fset) && (!S.frar || i.rar===S.frar));
+    (!S.fset || i.set===S.fset) && (!S.frar || i.rar===S.frar) &&
+    (S.pmin==null || (i.price||0) >= S.pmin) && (S.pmax==null || (i.price||0) <= S.pmax));
 }
 const nullLast = (x,y,f) => (x==null&&y==null) ? 0 : x==null ? 1 : y==null ? -1 : f(x,y);
 function sorter(){
@@ -394,10 +396,11 @@ function renderGrouped(rows){
 
 function render(){
   setSeg('view','v',S.view); setSeg('win','w',S.win);
-  const base = filtered().filter(i => (i.price||0) >= S.minp && i[S.win]!=null);
+  const floor = S.meta.movers_min_price ?? 1; // ignore very cheap cards in the movers lists (config.json)
+  const base = filtered().filter(i => (i.price||0) >= floor && i[S.win]!=null);
   $('#spikes').innerHTML = miniList(base.filter(i=>i[S.win]>0).sort((a,b)=>b[S.win]-a[S.win]).slice(0,10));
   $('#drops').innerHTML  = miniList(base.filter(i=>i[S.win]<0).sort((a,b)=>a[S.win]-b[S.win]).slice(0,10));
-  $('#spikeLbl').textContent = $('#dropLbl').textContent = `${winName[S.win]} · ≥ ${S.minp} €`;
+  $('#spikeLbl').textContent = $('#dropLbl').textContent = `${winName[S.win]} · ${S.pmin!=null||S.pmax!=null ? `${Math.max(floor,S.pmin??0)}–${S.pmax??'∞'} €` : `≥ ${floor} €`}`;
   const w = filtered().filter(i=>i.watch).sort(sorter());
   $('#watch').innerHTML = w.length ? renderGrouped(w) :
     '<div class="empty">No cards on your watchlist yet (or none match the filters). Add card names to <code>watchlist.txt</code> in your GitHub repo; they show up here after the next run.</div>';
