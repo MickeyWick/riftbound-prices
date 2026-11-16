@@ -65,7 +65,7 @@
   .tile{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:border-color .15s,transform .15s;position:relative}
   .tile:hover{border-color:var(--accent);transform:translateY(-2px)}
   .cimg{position:relative;width:100%;aspect-ratio:744/1039;border-radius:8px;overflow:hidden;background:var(--panel3)}
-  .cimg img{width:100%;height:100%;object-fit:cover;display:block}
+  .cimg img{width:100%;height:100%;object-fit:contain;display:block}  /* show the whole card, never crop (battlefields are landscape) */
   .cimg .ph{width:100%;height:100%;border-radius:0;font-size:13px}
   .cimg.foil::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.18) 45%,rgba(185,162,247,.18) 55%,transparent 70%);mix-blend-mode:screen;pointer-events:none}
   .ribbon{position:absolute;top:8px;left:8px;background:rgba(15,17,21,.85);border:1px solid #8b6fd6;color:var(--foil);font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;letter-spacing:.5px}
@@ -101,7 +101,9 @@
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:16px;z-index:10}
   .overlay.open{display:flex}
   .detail{background:var(--panel);border:1px solid var(--line);border-radius:14px;max-width:980px;width:100%;padding:18px;max-height:94vh;overflow:auto;display:flex;gap:18px}
-  .detail .cimg{width:300px;flex:0 0 300px}
+  .detail .cimg{width:300px;flex:0 0 300px;aspect-ratio:auto;align-self:flex-start;background:none}
+  .detail .cimg img{height:auto;border-radius:10px}
+  .detail .cimg .ph{aspect-ratio:744/1039}
   @media (max-width:760px){.detail{flex-direction:column}.detail .cimg{width:220px;flex-basis:auto;margin:0 auto}}
   .detail .right{flex:1;min-width:0}
   .detail h3{margin:0 0 4px;font-size:19px}
