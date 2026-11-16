@@ -273,11 +273,13 @@ def read_snapshot(path: Path):
         for r in csv.DictReader(f):
             pid = r["idProduct"]
             g = {k: (float(r[k]) if r.get(k) else None) for k in FIELDS}
-            if g["trend"] is not None or g["low"] is not None:
-                out[pid] = {"trend": g["trend"] or g["low"], "low": g["low"], "avg1": g["avg1"],
+            # Only use Cardmarket's trend price. A product with just a "low" price has no
+            # sales yet, and its cheapest listing can be a placeholder like 100,000 EUR.
+            if g["trend"] is not None:
+                out[pid] = {"trend": g["trend"], "low": g["low"], "avg1": g["avg1"],
                             "avg7": g["avg7"], "avg30": g["avg30"]}
-            if g["trend-foil"] is not None or g["low-foil"] is not None:
-                out[pid + "f"] = {"trend": g["trend-foil"] or g["low-foil"], "low": g["low-foil"],
+            if g["trend-foil"] is not None:
+                out[pid + "f"] = {"trend": g["trend-foil"], "low": g["low-foil"],
                                   "avg1": g["avg1-foil"], "avg7": g["avg7-foil"],
                                   "avg30": g["avg30-foil"]}
     return out
@@ -385,12 +387,13 @@ def build(cfg, extra_warnings=()):
             "kind": p.get("kind", "single"),
             "set": ci.get("set") or exp_names.get(str(exp), f"Set {exp}" if exp else ""),
             "sc": ci.get("setCode") or exp_codes.get(str(exp)) or "",
-            "rar": ci.get("rarity") or ("Sealed" if p.get("kind") == "sealed" else ""),
+            # OpenRift uses lowercase slugs ("showcase", "champion unit"): capitalise for display.
+            "rar": (ci.get("rarity") or "").title() or ("Sealed" if p.get("kind") == "sealed" else ""),
             "code": ci.get("code") or "",
             "rank": ci.get("rank"),
             "img": ci.get("img"),
-            "type": ci.get("type") or ("Sealed" if p.get("kind") == "sealed" else ""),
-            "dom": ci.get("domains") or [],
+            "type": (ci.get("type") or "").title() or ("Sealed" if p.get("kind") == "sealed" else ""),
+            "dom": [d.title() for d in (ci.get("domains") or [])],
             "slug": ci.get("slug"),
             "sig": ci.get("signed") or None,
             "price": v["trend"],
