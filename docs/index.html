@@ -173,7 +173,7 @@
       <label>Set <select id="fset"><option value="">All sets</option></select></label>
       <label>Rarity <select id="frar"><option value="">All rarities</option></select></label>
       <label><select id="kind"><option value="all">Singles + sealed</option><option value="single">Singles only</option><option value="sealed">Sealed only</option></select></label>
-      <label><select id="foil"><option value="all">Normal + foil</option><option value="normal">Normal only</option><option value="foil">Foil only</option></select></label>
+      <label><select id="foil"><option value="all">Normal + foil</option><option value="normal" title="Normal versions, plus cards that only exist in foil (Rares, Epics, Showcases)">Normal only</option><option value="foil">Foil only</option></select></label>
       <label>Price € <input type="number" id="pmin" min="0" step="0.5" placeholder="from"> – <input type="number" id="pmax" min="0" step="0.5" placeholder="to"></label>
     </div>
     <div class="crow"><input type="search" id="q" placeholder="Search card name, set or number…"></div>
@@ -247,6 +247,9 @@ async function load(){
     fetch('data/meta.json'+bust).then(r=>r.json()).catch(()=>({}))
   ]);
   S.items = latest.items; S.meta = meta;
+  // Cards with no normal version (foil-only Rares, Epics, Showcases) still count as "normal" in the filter.
+  const hasNormal = new Set(S.items.filter(i=>!i.foil).map(i=>i.id));
+  S.items.forEach(i => { i.foilOnly = i.foil && !hasNormal.has(i.id); });
   if (meta.rarity_order) RAR = meta.rarity_order;
   if (!loadPrefs()){ S.win = (meta.days_of_history||1) >= 8 ? 'ch7' : 'vs30'; }
   $('#sub').textContent = `Cardmarket trend prices for ${latest.date} · ${meta.days_of_history||1} day(s) of history · ${S.items.length.toLocaleString()} products`;
@@ -303,7 +306,7 @@ function headerSort(s){
 function filtered(){
   return S.items.filter(i =>
     (S.kind==='all' || i.kind===S.kind) &&
-    (S.foil==='all' || (S.foil==='foil') === i.foil) &&
+    (S.foil==='all' || (S.foil==='foil' ? i.foil : (!i.foil || i.foilOnly))) &&
     (!S.fset || i.set===S.fset) && (!S.frar || i.rar===S.frar) &&
     (S.pmin==null || (i.price||0) >= S.pmin) && (S.pmax==null || (i.price||0) <= S.pmax));
 }
