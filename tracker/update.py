@@ -40,6 +40,9 @@ RARITY_ORDER = ["Common", "Uncommon", "Rare", "Epic", "Showcase", "Promo"]
 DOCS_DATA = ROOT / "docs" / "data"
 XLSX_PATH = ROOT / "docs" / "riftbound_prices.xlsx"
 ALERTS_PATH = ROOT / "alerts.md"
+CARDS_PATH = DOCS_DATA / "cards.json"                    # binder catalog (all printings)
+COLLECTION_PATH = ROOT / "data" / "collection.json"      # written by the dashboard (GitHub sync)
+COLL_HIST_PATH = DOCS_DATA / "collection_history.json"   # daily collection value
 
 BASE = "https://downloads.s3.cardmarket.com/productCatalog"
 
@@ -227,6 +230,75 @@ def build_cardinfo(catalog, links):
     return out
 
 
+def _title(s):
+    return (s or "").title()
+
+
+def build_binder(catalog, links):
+    """
+    Every English printing, grouped into binder slots by printed card number
+    (normal + foil of the same card share a slot), with their Cardmarket product ids.
+    """
+    cards = catalog.get("cards", {})
+    pid_of = {}
+    for prid, link in (links.get("links") or {}).items():
+        cm = (link or {}).get("cardmarket") or {}
+        if cm.get("productId"):
+            pid_of[prid] = cm["productId"]
+    sets = {s["id"]: s for s in catalog.get("sets", [])}
+    slots = {}
+    for prid, pr in (catalog.get("printings") or {}).items():
+        if (pr.get("language") or "EN") != "EN":
+            continue
+        card = cards.get(pr.get("cardId"), {})
+        code = pr.get("publicCode") or pr.get("shortCode") or prid
+        key = code
+        s = slots.get(key)
+        if s is not None and s["card"] != card.get("slug"):
+            key = f"{code}|{card.get('slug')}"
+            s = slots.get(key)
+        imgs = pr.get("images") or []
+        img = (imgs[0].get("imageId") if imgs else None) or pr.get("fallbackImageId")
+        st = sets.get(pr.get("setId"), {})
+        if s is None:
+            s = slots[key] = {
+                "k": key, "name": card.get("name") or pr.get("printedName") or code,
+                "card": card.get("slug"), "set": st.get("slug") or "?",
+                "rank": pr.get("canonicalRank") if pr.get("canonicalRank") is not None else 10**9,
+                "rar": _title(pr.get("rarity")),
+                "type": _title(" ".join((card.get("superTypes") or []) + (card.get("types") or []))),
+                "dom": [_title(d) for d in card.get("domains") or []],
+                "img": img, "fin": [], "cm": {},
+            }
+            if pr.get("isSigned"):
+                s["sig"] = True
+            if pr.get("artVariant") and pr["artVariant"] != "normal":
+                s["art"] = pr["artVariant"]
+        finish = "foil" if (pr.get("finish") or "").lower() == "foil" else "normal"
+        if finish not in s["fin"]:
+            s["fin"].append(finish)
+        if prid in pid_of:
+            s["cm"].setdefault(finish, pid_of[prid])
+        if pr.get("canonicalRank") is not None:
+            s["rank"] = min(s["rank"], pr["canonicalRank"])
+        if not s["img"] and img:
+            s["img"] = img
+    out = sorted(slots.values(), key=lambda s: (s["rank"], s["k"]))
+    for s in out:
+        s["fin"].sort(key=lambda f: f != "normal")
+    first_rank = {}
+    for s in out:
+        first_rank.setdefault(s["set"], s["rank"])
+    set_list = []
+    for st in catalog.get("sets", []):
+        if st.get("slug") in first_rank:
+            set_list.append({"slug": st["slug"], "name": st.get("name"),
+                             "released": ((st.get("releases") or {}).get("EN") or {}).get("releasedAt"),
+                             "count": sum(1 for s in out if s["set"] == st["slug"])})
+    set_list.sort(key=lambda x: first_rank[x["slug"]])
+    return {"sets": set_list, "cards": out}
+
+
 def update_cardinfo(args):
     """Download OpenRift card data. Keeps the last good copy if OpenRift is unavailable."""
     if args.cardinfo_catalog:
@@ -242,6 +314,10 @@ def update_cardinfo(args):
     info = build_cardinfo(catalog, links)
     if len(info) < 50 and CARDINFO_PATH.exists():
         return f"OpenRift returned only {len(info)} linked cards - kept the last saved card data."
+    binder = build_binder(catalog, links)
+    DOCS_DATA.mkdir(parents=True, exist_ok=True)
+    CARDS_PATH.write_text(json.dumps(binder, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"Binder catalog: {len(binder['cards'])} cards in {len(binder['sets'])} sets")
     CARDINFO_PATH.write_text(json.dumps(info, ensure_ascii=False, sort_keys=True, separators=(",", ":")),
                              encoding="utf-8")
     print(f"Card data: {len(info)} Cardmarket products linked to card images")
@@ -423,6 +499,7 @@ def build(cfg, extra_warnings=()):
     (DOCS_DATA / "history.json").write_text(json.dumps({"dates": dates, "series": series},
                                                        separators=(",", ":")), encoding="utf-8")
 
+    record_collection_value(items, today)
     alerts = make_alerts(cfg, items, today, prev_date)
     meta = {
         "date": today,
@@ -444,6 +521,43 @@ def build(cfg, extra_warnings=()):
           f"{sum(i['watch'] for i in items)} watchlist entries, {len(alerts)} alert(s)")
     for w in warnings:
         print("WARNING:", w)
+
+
+def record_collection_value(items, today):
+    """Add today's collection value (from the synced collection.json) to collection_history.json."""
+    if not (COLLECTION_PATH.exists() and CARDS_PATH.exists()):
+        return
+    try:
+        coll = json.loads(COLLECTION_PATH.read_text(encoding="utf-8"))
+        slots = {s["k"]: s for s in json.loads(CARDS_PATH.read_text(encoding="utf-8"))["cards"]}
+    except (ValueError, KeyError) as e:
+        print(f"Collection value skipped: {e}", file=sys.stderr)
+        return
+    price = {it["k"]: it["price"] for it in items}
+    value, copies = 0.0, 0
+    for key, q in (coll.get("cards") or {}).items():
+        s = slots.get(key)
+        if not s:
+            continue
+        n, f = int(q.get("n") or 0), int(q.get("f") or 0)
+        copies += n + f
+        cm = s.get("cm") or {}
+        if n and cm.get("normal"):
+            value += n * (price.get(str(cm["normal"])) or 0)
+        if f:
+            pid = cm.get("foil") or cm.get("normal")
+            if pid:
+                value += f * (price.get(f"{pid}f") or price.get(str(pid)) or 0)
+    hist = {"dates": [], "value": [], "copies": []}
+    if COLL_HIST_PATH.exists():
+        hist = json.loads(COLL_HIST_PATH.read_text(encoding="utf-8"))
+    if today in hist["dates"]:
+        i = hist["dates"].index(today)
+        hist["value"][i], hist["copies"][i] = round(value, 2), copies
+    else:
+        hist["dates"].append(today); hist["value"].append(round(value, 2)); hist["copies"].append(copies)
+    COLL_HIST_PATH.write_text(json.dumps(hist, separators=(",", ":")), encoding="utf-8")
+    print(f"Collection: {copies} cards worth {value:.2f} EUR")
 
 
 def label(it):

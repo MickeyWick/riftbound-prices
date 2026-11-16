@@ -110,6 +110,9 @@
   .stat b{display:block;font-size:16px;font-variant-numeric:tabular-nums} .stat span{color:var(--muted);font-size:11px}
   svg.chart{width:100%;height:240px;display:block}
   .close{float:right}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:-4px 0 18px}
+  .tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--muted);padding:9px 14px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:-1px}
+  .tabs button:hover{color:var(--text)} .tabs button.on{color:var(--text);border-bottom-color:var(--accent)}
   footer{color:var(--muted);font-size:11px;margin-top:28px;text-align:center;line-height:1.6}
 </style>
 </head>
@@ -126,6 +129,11 @@
     </div>
   </header>
 
+  <nav class="tabs" id="tabs">
+    <button data-tab="prices">📈 Prices</button><button data-tab="collection">📚 My collection</button>
+  </nav>
+
+  <section id="tab-prices">
   <div id="notes"></div>
 
   <div class="controls">
@@ -187,6 +195,10 @@
     <div class="more"><button class="btn" id="moreBtn">Show more</button></div>
   </div>
 
+  </section>
+
+  <section id="tab-collection" hidden><div id="coll">Loading your collection…</div></section>
+
   <footer>
     Prices: Cardmarket daily price guide (trend price, EUR). Card images and set/rarity data:
     <a href="https://openrift.app" target="_blank" rel="noopener">OpenRift</a>.<br>
@@ -245,7 +257,8 @@ async function load(){
     notes += `<div class="note warn"><b>Warnings</b><br>${meta.warnings.map(esc).join('<br>')}</div>`;
   $('#notes').innerHTML = notes;
   fillFilters(); bindControls(); render();
-  fetch('data/history.json'+bust).then(r=>r.json()).then(h=>{ S.hist=h; if (S.view==='cards') renderBrowse(); });
+  window.dispatchEvent(new Event('prices-loaded'));
+  fetch('data/history.json'+bust).then(r=>r.json()).then(h=>{ S.hist=h; if (S.view==='cards') renderBrowse(); window.dispatchEvent(new Event('history-loaded')); });
 }
 
 function fillFilters(){
@@ -477,6 +490,18 @@ function csv(){
 }
 
 load().catch(e=>{ $('#sub').textContent = 'No data yet. Run the "Daily price update" workflow once in the Actions tab.'; console.error(e); });
+
+/* ---------- top-level tabs ---------- */
+function showTab(){
+  const t = (location.hash.replace('#','') || 'prices').split('/')[0];
+  const tab = t === 'prices' ? 'prices' : 'collection';
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on', b.dataset.tab===tab));
+  $('#tab-prices').hidden = tab!=='prices'; $('#tab-collection').hidden = tab!=='collection';
+  window.dispatchEvent(new Event('tab-changed'));
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{ location.hash = b.dataset.tab==='prices' ? '' : 'collection'; if(b.dataset.tab==='prices') showTab(); });
+window.addEventListener('hashchange', showTab); showTab();
 </script>
+<script src="collection.js"></script>
 </body>
 </html>

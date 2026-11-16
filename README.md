@@ -60,6 +60,27 @@ click **Commit changes**. The dashboard updates a minute later. You can write a 
 part of a name, a Cardmarket product link, or a product id. Add `(foil)` or `(normal)` to
 watch only one version. Lines that match nothing are listed as warnings on the dashboard.
 
+## My collection (binder and decklists)
+
+The **📚 My collection** tab on the dashboard has three parts:
+
+- **Binder:** every card in every set, in card-number order, 9 cards per page like a real
+  binder (two pages side by side on a computer). Use **+ / −** to set how many normal and foil
+  copies you own. Cards you don't own are greyed out. Search finds a card across all sets, and
+  you can show only owned or only missing cards. Arrow keys flip pages.
+- **My cards:** everything you own, with value and **where it is**, e.g.
+  *Kai'Sa, Survivor: 3× Rengar, Pridestalker · 2× Draven, Glorious Executioner*, plus how many
+  copies are spare or how many you're short for your decks.
+- **Decklists:** import decks by pasting a text list. On Piltover Archive: open the deck →
+  **Export** → **Export as Text**. Lists from other sites work too, one card per line like
+  `3 Kai'Sa, Survivor`. Each deck shows its Cardmarket price (cheapest version of each card),
+  how many cards you own, and what the missing ones would cost.
+
+**Where it's saved:** in your browser. Use **⬇ Backup** now and then. To use the same
+collection on your PC and phone, click **☁ Sync across devices** and follow the steps there:
+it uses a GitHub key that only has access to this repo, and saves to `data/collection.json`.
+With sync on, the daily update also charts your collection's value over time.
+
 ## Getting alerts by email
 
 Alerts are GitHub issues. GitHub emails you about new issues in your own repos by default.
