@@ -279,6 +279,10 @@ def build_binder(catalog, links):
             s["fin"].append(finish)
         if prid in pid_of:
             s["cm"].setdefault(finish, pid_of[prid])
+            # every Cardmarket product of this card number (reprints can have their own product)
+            alls = s.setdefault("cmx", {}).setdefault(finish, [])
+            if pid_of[prid] not in alls:
+                alls.append(pid_of[prid])
         if pr.get("canonicalRank") is not None:
             s["rank"] = min(s["rank"], pr["canonicalRank"])
         if not s["img"] and img:
@@ -436,6 +440,21 @@ def build(cfg, extra_warnings=()):
     exp_names = {k: v[0] for k, v in learned.items()}
     exp_codes = {k: v[1] for k, v in learned.items()}
     exp_names.update({str(k): v for k, v in cfg.get("expansions", {}).items()})
+    # Which finishes really exist per Cardmarket product (from OpenRift). Rares, epics and most
+    # showcases are foil-only: Cardmarket's "normal" numbers for them come from a few mislabelled
+    # listings and don't match the price shown on Cardmarket's own card page.
+    finishes = {}
+    if CARDS_PATH.exists():
+        try:
+            for s in json.loads(CARDS_PATH.read_text(encoding="utf-8"))["cards"]:
+                for fin, cm_pid in (s.get("cm") or {}).items():
+                    finishes.setdefault(str(cm_pid), set()).add(fin)
+                for fin, pids in (s.get("cmx") or {}).items():
+                    for cm_pid in pids:
+                        finishes.setdefault(str(cm_pid), set()).add(fin)
+        except (ValueError, KeyError):
+            finishes = {}
+    skipped = 0
 
     today_idx = len(history) - 1
     today, snap = history[today_idx]
@@ -450,6 +469,9 @@ def build(cfg, extra_warnings=()):
         foil = key.endswith("f")
         p = catalog.get(pid, {})
         if not cfg["include_sealed"] and p.get("kind") == "sealed":
+            continue
+        if pid in finishes and ("foil" if foil else "normal") not in finishes[pid]:
+            skipped += 1
             continue
         prev = history[today_idx - 1][1].get(key) if today_idx > 0 else None
         exp = p.get("expansion")
@@ -517,6 +539,8 @@ def build(cfg, extra_warnings=()):
     (DOCS_DATA / "meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1), encoding="utf-8")
     write_alerts(alerts, today, warnings)
     write_xlsx(cfg, items, history)
+    if skipped:
+        print(f"Left out {skipped} finish(es) that don't exist for that card (e.g. normal versions of foil-only rares)")
     print(f"{today}: {len(items)} products, {len(history)} day(s) of history, "
           f"{sum(i['watch'] for i in items)} watchlist entries, {len(alerts)} alert(s)")
     for w in warnings:
