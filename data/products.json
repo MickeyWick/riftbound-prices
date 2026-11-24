@@ -14068,5 +14068,551 @@
 "expansion": 6567,
 "kind": "single",
 "name": "Master Yi, Tempered"
+},
+"925835": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Blazing Scorcher"
+},
+"925836": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Brazen Buccaneer"
+},
+"925838": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Chemtech Enforcer"
+},
+"925839": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Disintegrate"
+},
+"925840": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Flame Chompers"
+},
+"925841": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Fury Rune"
+},
+"925842": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Legion Rearguard"
+},
+"925843": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Magma Wurm"
+},
+"925844": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Noxus Hopeful"
+},
+"925845": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Scrapyard Champion"
+},
+"925846": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Jinx, Demolitionist"
+},
+"925847": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Tryndamere, Barbarian"
+},
+"925848": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Vi, Destructive"
+},
+"925849": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Kadregrin the Infernal"
+},
+"925851": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Seal of Rage"
+},
+"925852": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Volibear, Furious"
+},
+"925853": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Calm Rune"
+},
+"925854": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Clockwork Keeper"
+},
+"925855": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Defy"
+},
+"925856": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "En Garde"
+},
+"925857": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Meditation"
+},
+"925858": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Wielder of Water"
+},
+"925859": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Discipline"
+},
+"925860": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Wind Wall"
+},
+"925861": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Seal of Focus"
+},
+"925864": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Yasuo, Remorseful"
+},
+"925865": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Mind Rune"
+},
+"925867": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Stupefy"
+},
+"925868": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Watchful Sentry"
+},
+"925869": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Wraith of Echoes"
+},
+"925870": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Unchecked Power"
+},
+"925871": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Challenge"
+},
+"925872": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Mobilize"
+},
+"925874": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Body Rune"
+},
+"925876": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Stormclaw Ursine"
+},
+"925877": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Catalyst of Aeons"
+},
+"925878": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Carnivorous Snapvine"
+},
+"925879": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Volibear, Imposing"
+},
+"925880": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Deadbloom Predator"
+},
+"925881": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Miss Fortune, Captain"
+},
+"925882": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Cemetery Attendant"
+},
+"925883": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Chaos Rune"
+},
+"925884": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Gust"
+},
+"925885": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Rebuke"
+},
+"925886": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Stealthy Pursuer"
+},
+"925887": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Undercover Agent"
+},
+"925888": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Traveling Merchant"
+},
+"925889": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Kayn, Unleashed"
+},
+"925890": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Maddened Marauder"
+},
+"925891": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Jinx, Rebel"
+},
+"925892": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Miss Fortune, Buccaneer"
+},
+"925893": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Possession"
+},
+"925894": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Seal of Discord"
+},
+"925895": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Cruel Patron"
+},
+"925896": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Cull the Weak"
+},
+"925897": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Faithful Manufactor"
+},
+"925898": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Hidden Blade"
+},
+"925899": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Order Rune"
+},
+"925900": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Soaring Scout"
+},
+"925901": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Vanguard Captain"
+},
+"925902": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Machine Evangel"
+},
+"925903": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Grand Strategem"
+},
+"925904": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Harnessed Dragon"
+},
+"925905": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Seal of Unity"
+},
+"925906": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Viktor, Leader"
+},
+"925907": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Stormbringer"
+},
+"925922": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Super Mega Death Rocket!"
+},
+"925925": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Last Breath"
+},
+"925926": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Siphon Power"
+},
+"925928": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Altar to Unity"
+},
+"925929": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Obelisk of Power"
+},
+"925932": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Reaver's Row"
+},
+"925933": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Targon's Peak"
+},
+"925934": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "The Grand Plaza"
+},
+"925935": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Trifarian War Camp"
+},
+"925937": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Void Gate"
+},
+"925939": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Windswept Hillock"
+},
+"925940": {
+"added": "2026-11-24",
+"category": "Riftbound Single",
+"expansion": 6480,
+"kind": "single",
+"name": "Zaun Warrens"
 }
 }
