@@ -14621,5 +14621,19 @@
 "expansion": 6480,
 "kind": "single",
 "name": "Recruit"
+},
+"926395": {
+"added": "2026-11-25",
+"category": "Riftbound Display",
+"expansion": 6659,
+"kind": "sealed",
+"name": "Radiance Booster Box (Chinese, Jumbo)"
+},
+"926401": {
+"added": "2026-11-25",
+"category": "Riftbound Display",
+"expansion": 6659,
+"kind": "sealed",
+"name": "Radiance Booster Box (Chinese, Slim)"
 }
 }
